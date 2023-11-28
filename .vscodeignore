@@ -1,0 +1,11 @@
+.vscode/**
+.vscode-test/**
+out/**
+!out/extension.js
+src/**
+.gitignore
+tsconfig.json
+xvfb.out
+node_modules/**
+**/*.js.map
+.vscode-test.js
