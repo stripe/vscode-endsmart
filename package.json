@@ -3,7 +3,7 @@
   "displayName": "Endsmart",
   "description": "A modern version of endwise that relies on more recent VSCode APIs.",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "stripe",
   "icon": "images/icon.png",
   "engines": {
