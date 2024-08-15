@@ -32,7 +32,7 @@ suite('formatter tests', () => {
     return edits;
   };
 
-  test('can add end to a block', async () => {
+  test('adds "end" to an if block', async () => {
     const content = 'if foo$';
     const edits = await runFormatter(content);
 
@@ -54,7 +54,7 @@ suite('formatter tests', () => {
     assert.deepEqual(edits![0].range, new vscode.Range(2, 0, 2, 0));
   });
 
-  test('does not add end if it exists already', async () => {
+  test("doesn't add end if it exists already", async () => {
     const content = 'if foo$\nend';
     const edits = await runFormatter(content);
 
@@ -62,20 +62,20 @@ suite('formatter tests', () => {
     assert.strictEqual(edits, undefined);
   });
 
-  test("does not add end when there's already one on the same line", async () => {
-    const contents = ['if foo; end$', 'if foo; end;$', 'if foo; end ; foo()$'];
-    for (const content of contents) {
-      const edits = await runFormatter(content);
-      assert.strictEqual(edits, undefined);
-    }
-  });
+  ['if foo; end$', 'if foo; end;$', 'if foo; end ; foo()$'].forEach(
+    (content) => {
+      test(`doesn't add end when there's already one on the same line - ${content}`, async () => {
+        const edits = await runFormatter(content);
+        assert.strictEqual(edits, undefined);
+      });
+    },
+  );
 
-  test('does not add end for endless methods', async () => {
-    const contents = ['def foo =$', 'def foo = $', 'def foo = bar$'];
-    for (const content of contents) {
+  ['def foo =$', 'def foo = $', 'def foo = bar$'].forEach((content) => {
+    test(`doesn't add end for endless methods — ${content}`, async () => {
       const edits = await runFormatter(content);
-      assert.strictEqual(edits, undefined);
-    }
+      assert.strictEqual(edits, undefined, '');
+    });
   });
 
   test('support nested blocks, add end', async () => {
