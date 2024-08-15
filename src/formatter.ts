@@ -53,6 +53,16 @@ export default class EndsmartOnTypeFormatter
       return;
     }
 
+    // If we have found a beginning keyword, make sure that the cursor is not currently
+    // in the middle of an expression (typical of an if statement e.g. `if ![$]` where
+    // the end insertion would be wrong because it would end up inside `[]`). We do this
+    // by seeing if the line represented by position is an empty line which it should be
+    // if Enter was pressed at the end of the previous line
+    const currentLine = document.lineAt(position.line);
+    if (!currentLine.isEmptyOrWhitespace) {
+      return;
+    }
+
     // Save what the previous line indentation is, if we are using tabs it's directly the value
     // if using spaces we need to calculate an amount
     const indentationLevel = this.indentationFor(lineBeforeNewLine, options);
