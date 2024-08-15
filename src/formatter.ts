@@ -14,7 +14,7 @@ const TRIGGER_STATEMENTS = [
   /^begin/,
   /.*\sdo/,
 ];
-const SINGLE_LINE_DEFINITION = /;\s*end[\s;]*$/;
+const SINGLE_LINE_DEFINITION = /((;\s*end[\s;]*)|(\s=[\s;]+))/;
 const LINE_PARSE_LIMIT = 1000;
 
 export default class EndsmartOnTypeFormatter
