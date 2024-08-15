@@ -12,6 +12,7 @@ suite('formatter tests', () => {
       content,
     });
 
+  // Special character `$` marks the cursor position
   const runFormatter = async (
     content: string,
   ): Promise<vscode.TextEdit[] | undefined | null> => {
@@ -42,12 +43,39 @@ suite('formatter tests', () => {
     assert.deepEqual(edits![0].range, new vscode.Range(2, 0, 2, 0));
   });
 
+  test('adds an "end" to an assignment method', async () => {
+    const content = 'def foo=$';
+    const edits = await runFormatter(content);
+
+    assert.notStrictEqual(edits, null);
+    assert.strictEqual(edits?.length, 1);
+    assert.strictEqual(edits![0].newText, 'end\n');
+    // Inserted at end of document
+    assert.deepEqual(edits![0].range, new vscode.Range(2, 0, 2, 0));
+  });
+
   test('does not add end if it exists already', async () => {
     const content = 'if foo$\nend';
     const edits = await runFormatter(content);
 
     // No edits should be returned since the doc is balanced
     assert.strictEqual(edits, undefined);
+  });
+
+  test("does not add end when there's already one on the same line", async () => {
+    const contents = ['if foo; end$', 'if foo; end;$', 'if foo; end ; foo()$'];
+    for (const content of contents) {
+      const edits = await runFormatter(content);
+      assert.strictEqual(edits, undefined);
+    }
+  });
+
+  test('does not add end for endless methods', async () => {
+    const contents = ['def foo =$', 'def foo = $', 'def foo = bar$'];
+    for (const content of contents) {
+      const edits = await runFormatter(content);
+      assert.strictEqual(edits, undefined);
+    }
   });
 
   test('support nested blocks, add end', async () => {
