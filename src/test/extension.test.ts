@@ -14,7 +14,7 @@ suite('formatter tests', () => {
 
   const runFormatter = async (
     content: string,
-  ): Promise<vscode.TextEdit[] | undefined | null> => {
+  ): Promise<[vscode.TextEdit[] | undefined | null, vscode.TextDocument]> => {
     const formatter = new EndsmartOnTypeFormatter();
     // Cursor should be after the newline
     const cursorPosition = content.indexOf('$') + 1;
@@ -28,12 +28,12 @@ suite('formatter tests', () => {
       {insertSpaces: true, tabSize: 2},
       cancellationToken,
     );
-    return edits;
+    return [edits, doc];
   };
 
   test('can add end to a block', async () => {
     const content = 'if foo$';
-    const edits = await runFormatter(content);
+    const [edits] = await runFormatter(content);
 
     assert.notStrictEqual(edits, null);
     assert.strictEqual(edits?.length, 1);
@@ -44,7 +44,7 @@ suite('formatter tests', () => {
 
   test('does not add end if it exists already', async () => {
     const content = 'if foo$\nend';
-    const edits = await runFormatter(content);
+    const [edits] = await runFormatter(content);
 
     // No edits should be returned since the doc is balanced
     assert.strictEqual(edits, undefined);
@@ -55,7 +55,7 @@ suite('formatter tests', () => {
 if foo
   begin$
 end`;
-    const edits = await runFormatter(content);
+    const [edits] = await runFormatter(content);
 
     assert.notStrictEqual(edits, null);
     assert.strictEqual(edits?.length, 1);
@@ -70,7 +70,7 @@ if foo
   begin$
   end
 end`;
-    const edits = await runFormatter(content);
+    const [edits] = await runFormatter(content);
 
     // No edits should be returned since the doc is balanced
     assert.strictEqual(edits, undefined);
@@ -79,14 +79,20 @@ end`;
   test('does not add end with a return if statement', async () => {
     const content = `
 return if foo$`;
-    const edits = await runFormatter(content);
+    const [edits] = await runFormatter(content);
     assert.strictEqual(edits, undefined);
   });
 
   test('does not add end to a random statement even a portion of a trigger keyword is in it', async () => {
     const content = `
 Module::Factorify::SbeginClass.method()$`;
-    const edits = await runFormatter(content);
+    const [edits] = await runFormatter(content);
+    assert.strictEqual(edits, undefined);
+  });
+
+  test('does not add end if cursor is inside an if statement expression', async () => {
+    const content = 'if ![$]';
+    const [edits] = await runFormatter(content);
     assert.strictEqual(edits, undefined);
   });
 });
