@@ -31,17 +31,6 @@ suite('formatter tests', () => {
     return [edits, doc];
   };
 
-  const applyEdits = async (
-    doc: vscode.TextDocument,
-    edits: vscode.TextEdit[],
-  ): Promise<boolean> => {
-    const workspaceEdit = new vscode.WorkspaceEdit();
-    edits.forEach((edit) =>
-      workspaceEdit.replace(doc.uri, edit.range, edit.newText),
-    );
-    return await vscode.workspace.applyEdit(workspaceEdit);
-  };
-
   test('can add end to a block', async () => {
     const content = 'if foo$';
     const [edits] = await runFormatter(content);
