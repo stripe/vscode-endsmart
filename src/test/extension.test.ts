@@ -95,4 +95,22 @@ Module::Factorify::SbeginClass.method()$`;
     const [edits] = await runFormatter(content);
     assert.strictEqual(edits, undefined);
   });
+
+  test('does not add end to an endless method with params', async () => {
+    const content = 'def double(x) = x * 2$';
+    const [edits] = await runFormatter(content);
+    assert.strictEqual(edits, undefined);
+  });
+
+  test('does not add end to an endless method without params', async () => {
+    const content = 'def greet = "hello"$';
+    const [edits] = await runFormatter(content);
+    assert.strictEqual(edits, undefined);
+  });
+
+  test('does not add end to an indented endless method', async () => {
+    const content = 'class Foo\n  def double(x) = x * 2$\nend';
+    const [edits] = await runFormatter(content);
+    assert.strictEqual(edits, undefined);
+  });
 });
