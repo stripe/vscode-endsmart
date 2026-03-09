@@ -15,6 +15,7 @@ const TRIGGER_STATEMENTS = [
   /.*\sdo/,
 ];
 const SINGLE_LINE_DEFINITION = /;\s*end[\s;]*$/;
+const ENDLESS_METHOD = /^\s*def\s+\w+(\([^)]*\))?\s*=[^=]/;
 const LINE_PARSE_LIMIT = 1000;
 
 export default class EndsmartOnTypeFormatter
@@ -45,6 +46,11 @@ export default class EndsmartOnTypeFormatter
 
     // Exit early if we are in the presence of a single statement line
     if (lineBeforeNewLine.text.match(SINGLE_LINE_DEFINITION)) {
+      return;
+    }
+
+    // Exit early for endless methods (e.g. `def double(x) = x * 2`)
+    if (lineBeforeNewLine.text.match(ENDLESS_METHOD)) {
       return;
     }
 
